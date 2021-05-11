@@ -5,8 +5,31 @@ import { Image, View, Text, StyleSheet, TouchableOpacity, TextInput, SafeAreaVie
 
 export default function AppView() {
 
+  const [quantidade, setQuantidade] = useState(0);
+  const realizaPedidoBtn = useRef(null);
 
-  const realizarButton = useRef < TouchableHighlight > (null);
+  useEffect(() => {
+
+    async function getStorage() {
+      const quantidadeStorage = await AsyncStorage.getItem('quantidade');
+      if (quantidadeStorage !== null) {
+        setQuantidade(parseInt(quantidadeStorage))
+      }
+    }
+
+    getStorage();
+
+  }, []);
+
+  useEffect(() => {
+    async function saveStorage() {
+      await AsyncStorage.setItem('quantidade', quantidade);
+    }
+    saveStorage();
+  }, [quantidade]);
+
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -22,10 +45,11 @@ export default function AppView() {
 
         <View style={styles.div3}>
           <Text style={styles.prod}>Iphone 5 </Text>
-          <Text style={styles.quant}>Quantidade: {null}</Text>
+          <Text style={styles.quant}>Quantidade: {quantidade}</Text>
           <View style={styles.divb}>
             <TextInput style={styles.tinput}
-              onChangeText={null}
+              value={quantidade.toString()}
+              onChangeText={(texto) => texto === '' ? setQuantidade(0) : setQuantidade(parseInt(texto))}
               placeholder="0"
               keyboardType="numeric"
             />
@@ -34,14 +58,14 @@ export default function AppView() {
               name="pluscircle"
               size={20}
               color="green"
-              onPress={null}
+              onPress={() => setQuantidade(quantidade + 1)}
             />
           </View>
         </View>
       </View>
 
       <View>
-        <TouchableHighlight style={styles.btnfin} onPress={() => realizarPedidoButton.current?.focus()}>
+        <TouchableHighlight style={styles.btnfin} onPress={() => realizaPedidoBtn.current?.focus()}>
           <Text>FINALIZAR</Text>
         </TouchableHighlight>
       </View>
@@ -49,10 +73,10 @@ export default function AppView() {
 
 
       <View>
-        <TouchableHighlight style={styles.btnre} onPress={null}>
-          <View style={{flexDirection: 'row'}}>
-          <AntDesign style={{ paddingRight: 4 }} name="shoppingcart" size={24} color="#fff" />
-          <Text style={styles.txt}>Realizar Pedido</Text>
+        <TouchableHighlight style={styles.btnre} onPress={null} ref={realizaPedidoBtn} >
+          <View style={{ flexDirection: 'row' }}>
+            <AntDesign style={{ paddingRight: 4 }} name="shoppingcart" size={24} color="#fff" />
+            <Text style={styles.txt}>Realizar Pedido</Text>
           </View>
         </TouchableHighlight>
       </View>
